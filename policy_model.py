@@ -14,11 +14,11 @@ class Gen_Model():
 	def predict(self, x):
 		return self.model.predict(x)
 
-	def fit(self, states, targets, epochs, verbose, validation_split, batch_size):
-		return self.model.fit(states, targets, epochs=epochs, verbose=verbose, validation_split = validation_split, batch_size = batch_size)
+	def fit(self, states, targets, epochs, verbose, validation_split, batch_size, callbacks):
+		return self.model.fit(states, targets, epochs=epochs, verbose=verbose, validation_split = validation_split, batch_size = batch_size, callbacks=callbacks )
 
 	def write(self, game, version):
-		self.model.save(run_folder + 'models/version' + "{0:0>4}".format(version) + '.h5')
+		self.model.save('policy_model_save/version' + "{0:0>4}".format(version) + '.h5')
 
 	def read(self, game, run_number, version):
 		return load_model( run_archive_folder + '/run' + str(run_number).zfill(4) + "/models/version" + "{0:0>4}".format(version) + '.h5', custom_objects={'softmax_cross_entropy_with_logits': softmax_cross_entropy_with_logits})
@@ -175,9 +175,7 @@ class Policy_Residual_CNN(Gen_Model):
 		ph = self.policy_head(x)
 
 		model = Model(inputs=[main_input], outputs=[ph])
-		model.compile(loss={'policy_head': 'CategoricalCrossentropy'},
-			optimizer=SGD(lr=self.learning_rate, momentum = config.MOMENTUM),		
-			)
+		model.compile(loss='categorical_crossentropy',optimizer='adam',metrics= 'acc')
 
 		return model
 

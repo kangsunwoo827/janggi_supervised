@@ -1,7 +1,7 @@
 import numpy as np
 import logging
 from utils import form_to_board, coord_to_action, action_to_coord, can_move, make_action_space, identity_space_index
-from visualize import Visualize
+# from visualize import Visualize
 #게임 보드판과 턴을 받고 다양한 함수 실행
 #보드판은 row 10에 col9인 array (shape = 10,9 )
 # Cho turn: +1, Han turn: -1
@@ -14,6 +14,7 @@ class Game:
 		formation_cho=form_to_board(self.cho_form)
 		formation_han=form_to_board(self.han_form)
 		self.init_board=np.concatenate([np.flip(formation_han*(-1), axis=0),formation_cho])
+		self.init_board[2,4]=6
 		self.num_turn=1
 		self.gameState = GameState(self.init_board, self.num_turn)
 		
