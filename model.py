@@ -11,13 +11,13 @@ from tensorflow.keras.layers import Input, Dense, Conv2D, Flatten, BatchNormaliz
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras import regularizers
 
-from loss import softmax_cross_entropy_with_logits
+# from loss import softmax_cross_entropy_with_logits
 
 # import loggers as lg
 
 import keras.backend as K
 
-from settings import run_folder, run_archive_folder
+# from settings import run_folder, run_archive_folder
 
 class Gen_Model():
 	def __init__(self, reg_const, learning_rate, input_dim, output_dim):

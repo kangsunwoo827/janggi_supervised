@@ -8,7 +8,7 @@ from visualize import Visualize
 # No mark: 0, Cho mark: Plus, Han mark = minus
 class Game:
 
-	def __init__(self,cho_form='mssm',han_form='mssm'):		
+	def __init__(self,cho_form='마상상마',han_form='마상상마'):		
 		self.cho_form=cho_form
 		self.han_form=han_form
 		formation_cho=form_to_board(self.cho_form)
@@ -26,7 +26,7 @@ class Game:
 		self.state_size = len(self.gameState.BoardToInput)
 		self.action_size = len(self.actionSpace)
 
-	def reset(self,cho_form='mssm',han_form='mssm'):
+	def reset(self,cho_form='마상상마',han_form='마상상마'):
 		self.currentPlayer=1
 		formation_cho=form_to_board(cho_form)
 		formation_han=form_to_board(han_form)
@@ -84,14 +84,13 @@ class GameState():
 			self.playerScore+=1.5
 
 		self.BoardToInput = self._convertBoardToInput()
-		self.id = self._convertStateToId()
+		# self.id = self._convertStateToId()
 		self.score = self._getScore()
-		self.allowedActions = self._allowedActions()
 		self.isEndGame,self.who_win = self._checkForEndGame()
 
 
 	#Action 중 가능한 Action return
-	def _allowedActions(self):
+	def allowedActions(self):
 		allowed = []
 		
 		#player_piece는 살아있는 아군 기물의 위치와 번호를 담은 리스트
@@ -126,7 +125,7 @@ class GameState():
 
 	#state를 Input array들로 변환 
 	def _convertBoardToInput(self):
-		input_arr=np.zeros((15,10,9))
+		input_arr=np.zeros((15,10,9),dtype=float)
 		for i in range(7):
 			#해당되는 값이 아닌 곳은 0으로 
 			mark=(i+1)*self.playerTurn

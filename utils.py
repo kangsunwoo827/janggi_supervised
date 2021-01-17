@@ -18,7 +18,7 @@ def setup_logger(name, log_file, level=logging.INFO):
 
 #formation을 제공하면 board의 반쪽을 만들어주는 함수
 def form_to_board(form):
-    formation_lst=[4 if s=='m' else 3 for s in form] 
+    formation_lst=[4 if s=='마' else 3 for s in form] 
     
 
     A=formation_lst[0]
@@ -46,31 +46,26 @@ def coord_to_action(coord):
         before[0]=-1
     if after[0] == 9:
         after[0]=-1
+    before=[str(i+1) for i in before]
+    after=[str(i+1) for i in after]
 
-    action_before=[before[0]+1, before[1]+1]
-    action_after=[after[0]+1, after[1]+1]
+    action='{}{}'.format(''.join(before),''.join(after))
 
-    return [action_before,action_after]
+
+    return action
 
 def action_to_coord(action):
-    copy_action=np.array(action)
-    before=copy_action[0]
-    after=copy_action[1]
-    
-    if not before[0]:
-        before[0]=10
-    if not after[0]:
-        after[0]=10
+    action=list(action)
+    if action[0]=='0':
+        action[0]=10
+    if action[2]=='0':
+        action[2]=10
 
-    coord_before=[before[0]-1, before[1]-1]
-    coord_after=[after[0]-1, after[1]-1]
-
-    return [coord_before,coord_after]
+    action=[int(i)-1 for i in action]
+    return [action[:2],action[-2:]]
 
 
 #말번호와 위치를 넣으면 도착 가능한 coord 반환
-
-
 def can_move(piece,before,gameboard,turn):
     #move_list는 행마를 이용해 이동 가능한 위치 
     move_list=[]
@@ -347,10 +342,9 @@ def can_move(piece,before,gameboard,turn):
                 
             if block:
                 continue
-    
+
         can_list.append(after)
         
-
 
     return can_list
 
