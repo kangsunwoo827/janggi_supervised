@@ -14,7 +14,6 @@ class Game:
 		formation_cho=form_to_board(self.cho_form)
 		formation_han=form_to_board(self.han_form)
 		self.init_board=np.concatenate([np.flip(formation_han*(-1), axis=0),formation_cho])
-		self.init_board[2,4]=6
 		self.num_turn=1
 		self.gameState = GameState(self.init_board, self.num_turn)
 		
@@ -85,7 +84,7 @@ class GameState():
 			self.playerScore+=1.5
 
 		self.BoardToInput = self._convertBoardToInput()
-		# self.id = self._convertStateToId()
+		self.id = self._convertStateToId()
 		self.score = self._getScore()
 		self.isEndGame,self.who_win = self._checkForEndGame()
 
@@ -139,7 +138,7 @@ class GameState():
 	def _convertStateToId(self):
 		flat = self.board.flatten()
 		id = ''.join(map(str,flat))
-		id = ''.join([id,'t',str(self.num_turn)])
+		id = ''.join([id,'t',str(self.playerTurn)])
 		return id
 
 	#게임이 끝났는지 확인

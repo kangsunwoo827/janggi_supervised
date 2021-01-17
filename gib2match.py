@@ -11,6 +11,7 @@ def gib2match(path):
     data = [match for match in data if not  '. i' in match]
     data = [match for match in data if not '접장기' in match]
     data = [match for match in data if not '구기보' in match]
+    data = [match for match in data if not '한수' in match]
 
     
     pickle.dump(data, open( "gib_str/{}len{}.p".format(path[8:],len(data)), "wb" ) )
