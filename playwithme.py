@@ -11,10 +11,11 @@ def playwithme(model,turn):
     window.show(env.gameState)
     while True:
         if turn==env.gameState.playerTurn:
-            while True:
-                action=window.wait_click()
-                if action != None:
-                    break
+            action=input('action을 골라주세요')
+            # while True:
+            #     action=window.wait_click()
+            #     if action != None:
+            #         break
             env.step(action)
 
         else:
