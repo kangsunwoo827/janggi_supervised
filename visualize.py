@@ -520,7 +520,58 @@ class Visualize:
         pygame.display.update()
     
     def wait_click(self):
-        
+        mouse_pos = 0
+        check_valid_pos = False
+        wait_move = False
+        allowedActions = self.gameState.allowedActions()
+        result=None
+        while True:
+            if pygame.mouse.get_pressed()[0]:
+                    mouse_pos = pygame.mouse.get_pos()
+
+            if mouse_pos != 0 :
+                for i in range(len(self.X_coord)):
+                    for j in range(len(self.Y_coord)):
+                        if (self.X_coord[i] - 15 < mouse_pos[0] < self.X_coord[
+                            i] + 15) and (self.Y_coord[j] - 15 < mouse_pos[1] <
+                                                self.Y_coord[j] + 15):
+                            check_valid_pos = True
+                            input_coord=(j, i)
+                            print(input_coord)
+            
+            if check_valid_pos:
+                for action in allowedActions:
+                    before=action_to_coord(action)[0]
+                    if before[0]==input_coord[0] and before[1]==input_coord[1] :
+                        wait_move=True
+                        wait_input_before=before
+                        after=action_to_coord(action)[1]
+                        x=X_coord[after[1]]
+                        y=Y_coord[after[0]]
+                        print('draw circle')
+                        if self.gameboard[after[0],after[1]]==0:
+                            pygame.draw.circle(DISPLAYSURF,GREEN,(x,y),7)
+                        else:
+                            pygame.draw.circle(DISPLAYSURF,RED,(x,y),7)
+
+            if wait_move:
+                for action in allowedActions:
+                    before=action_to_coord(action)[0]
+                    if before[0]==wait_input_before[0] and before[1]==wait_input_before[1] :
+                        after=action_to_coord(action)[1]
+                        if after[0]==input_coord[0] and after[1]==input_coord[1]:
+                            print('result is action')
+                            result=action
+
+        return result
+
+            
+
+
+
+
+
+
     # Exit the game
     def terminate(self):
         pygame.quit()
