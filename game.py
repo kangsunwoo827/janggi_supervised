@@ -84,6 +84,7 @@ class GameState():
 			self.playerScore+=1.5
 
 		self.BoardToInput = self._convertBoardToInput()
+		# self.BoardToNewInput = self._newconvertBoardToInput()
 		self.id = self._convertStateToId()
 		self.score = self._getScore()
 		self.isEndGame,self.who_win = self._checkForEndGame()
@@ -113,7 +114,7 @@ class GameState():
 		# allowed=self.check_repetition(allowed)
 		#coord 형태로 되어있기 때문에 action 형태로 변환
 		allowed=[coord_to_action(coord) for coord in allowed]
-		allowed.append(None)
+		# allowed.append(None) # None 추가
 
 		return allowed
 
@@ -134,11 +135,129 @@ class GameState():
 		input_arr[14]=np.ones((10,9))*self.playerTurn
 		return input_arr
 
+	def newInput(self):
+		input_arr=np.zeros((29,10,9),dtype=float)
+		#0~6 : 본인의 기물 위치
+		#7~13 : 상대의 기물 위치 
+		#14 : 누구의 턴인지
+		for i in range(7):
+			#해당되는 값이 아닌 곳은 0으로 
+			mark=(i+1)*self.playerTurn
+			input_arr[i]=np.where(self.board!=mark,0,self.board)
+			input_arr[i+7]=np.where(self.board!=-mark,0,self.board)
+			input_arr[i+14]=np.zeros((10,9)) #위헙을 가하고 있는 상대 기물
+			input_arr[i+21]=np.zeros((10,9)) #위헙을 당하고 있느 나의 기물
+
+		for now_action in self.allowedActions():
+			if now_action==None:
+				continue
+			after=action_to_coord(now_action)[1]
+			for i in range(7):
+				oppo_mark=-(i+1)*self.playerTurn
+				if self.board[after[0],after[1]]==oppo_mark:
+					input_arr[i+14][after[0],after[1]]=1	
+
+		next_state=GameState(self.board, self.num_turn+1)
+		for next_action in next_state.allowedActions():
+			if next_action==None:
+				continue
+			after=action_to_coord(next_action)[1]
+			for i in range(7):
+				mark=(i+1)*self.playerTurn
+				if self.board[after[0],after[1]]==mark:
+					input_arr[i+21][after[0],after[1]]=1
+		
+
+		input_arr[28]=np.ones((10,9))*self.playerTurn
+		return input_arr
+
+
+	def newInput(self):
+		input_arr=np.zeros((29,10,9),dtype=float)
+		#0~6 : 본인의 기물 위치
+		#7~13 : 상대의 기물 위치 
+		#14~20 : 본인이 취할 수 있는 상대 기물 위치
+		#21~27 : 상대가 취할 수 있는 본인 기물 위치
+		#28 : 누구의 턴인지
+		for i in range(7):
+			#해당되는 값이 아닌 곳은 0으로 
+			mark=(i+1)*self.playerTurn
+			input_arr[i]=np.where(self.board!=mark,0,self.board)
+			input_arr[i+7]=np.where(self.board!=-mark,0,self.board)
+			input_arr[i+14]=np.zeros((10,9)) #위헙을 가하고 있는 상대 기물
+			input_arr[i+21]=np.zeros((10,9)) #위헙을 당하고 있느 나의 기물
+
+		for now_action in self.allowedActions():
+			if now_action==None:
+				continue
+			after=action_to_coord(now_action)[1]
+			for i in range(7):
+				oppo_mark=-(i+1)*self.playerTurn
+				if self.board[after[0],after[1]]==oppo_mark:
+					input_arr[i+14][after[0],after[1]]=1	
+
+		next_state=GameState(self.board, self.num_turn+1)
+		for next_action in next_state.allowedActions():
+			if next_action==None:
+				continue
+			after=action_to_coord(next_action)[1]
+			for i in range(7):
+				mark=(i+1)*self.playerTurn
+				if self.board[after[0],after[1]]==mark:
+					input_arr[i+21][after[0],after[1]]=1
+		
+
+		input_arr[28]=np.ones((10,9))*self.playerTurn
+		return input_arr
+
+
+
+	def newnewInput(self):
+		#0~6 : 본인의 기물 위치
+		#7~13 : 상대의 기물 위치 
+		#14~20 : 본인이 취할 수 있는 상대 기물 위치
+		#21~27 : 상대가 취할 수 있는 본인 기물 위치
+		#28~34 : 본인이 취할 수 있지만, 상대 기물이 보복 가능한 위치 
+		#35~41 : 상대가 취할 수 있지만, 본인 기물이 보복 가능한 위치
+		#42 : 누구의 턴인지
+		input_arr=np.zeros((29,10,9),dtype=float)
+		for i in range(7):
+			#해당되는 값이 아닌 곳은 0으로 
+			mark=(i+1)*self.playerTurn
+			input_arr[i]=np.where(self.board!=mark,0,self.board)
+			input_arr[i+7]=np.where(self.board!=-mark,0,self.board)
+			input_arr[i+14]=np.zeros((10,9)) #위헙을 가하고 있는 상대 기물
+			input_arr[i+21]=np.zeros((10,9)) #위헙을 당하고 있는 나의 기물
+			input_arr[i+28]=np.zeros((10,9)) #상대가 보복 가능한 위치
+			input_arr[i+35]=np.zeros((10,9)) #본인이 보복 가능한 위치
+
+		for now_action in self.allowedActions():
+			if now_action==None:
+				continue
+			after=action_to_coord(now_action)[1]
+			for i in range(7):
+				oppo_mark=-(i+1)*self.playerTurn
+				if self.board[after[0],after[1]]==oppo_mark:
+					input_arr[i+14][after[0],after[1]]=1	
+
+		next_state=GameState(self.board, self.num_turn+1)
+		for next_action in next_state.allowedActions():
+			if next_action==None:
+				continue
+			after=action_to_coord(next_action)[1]
+			for i in range(7):
+				mark=(i+1)*self.playerTurn
+				if self.board[after[0],after[1]]==mark:
+					input_arr[i+21][after[0],after[1]]=1
+		
+
+		input_arr[28]=np.ones((10,9))*self.playerTurn
+		return input_arr
 	#state를 id로 변환
 	def _convertStateToId(self):
 		flat = self.board.flatten()
 		id = ''.join(map(str,flat))
-		id = ''.join([id,'t',str(self.playerTurn)])
+		id = ''.join([id,'t',str(self.num_turn)])
 		return id
 
 	#게임이 끝났는지 확인
@@ -157,15 +276,14 @@ class GameState():
 		if playerScore<10:
 			isEnd=True
 			who_win= -self.playerTurn
-		
 
-		#200턴안에 안끝나면 종료
-		if self.num_turn > 200:
-			isEnd=True
-			if playerScore>oppoScore :
-				who_win=self.playerTurn
-			else:
-				who_win= -self.playerTurn		
+		# #200턴안에 안끝나면 종료
+		# if self.num_turn > 200:
+		# 	isEnd=True
+		# 	if playerScore>oppoScore :
+		# 		who_win=self.playerTurn
+		# 	else:
+		# 		who_win= -self.playerTurn		
 
 		return isEnd,who_win
 
@@ -230,7 +348,7 @@ class GameState():
 		if newState.isEndGame:
 			#winner and turn is same      -> +1
 			#winner and turn is different -> -1
-			value = newState.who_win * newState.playerTurn
+			value = -1
 			done = 1
 
 		return newState, value, done

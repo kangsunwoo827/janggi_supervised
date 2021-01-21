@@ -468,7 +468,10 @@ class Visualize:
         # Cho wins: +1, Han wins: -1, playing: 0
         self.win_index = self.gameState.who_win
 
-        self.janggoon=False
+        if np.sum(self.gameState.newInput()[27]):
+            self.janggoon=True
+        else:
+            self.janggoon=False
         self.mate=False
         self.can_go=None
         self.wait_move=False
@@ -516,6 +519,8 @@ class Visualize:
         self.__init__(newState)
         pygame.display.update()
     
+    def wait_click(self):
+        
     # Exit the game
     def terminate(self):
         pygame.quit()
@@ -642,19 +647,19 @@ class Visualize:
     
     def jang_msg(self):            
         if self.janggoon:
-            if self.turn:
+            if self.turn==-1:
                 color=BLUE
             else:
                 color=RED
             if self.mate:
                 mateSurf = TITLE_FONT.render('Mate!', True, color)
                 mateRect = mateSurf.get_rect()
-                mateRect.center = (HALF_WINDOW_WIDTH,140)
+                mateRect.center = (HALF_WINDOW_WIDTH,110)
                 DISPLAYSURF.blit(mateSurf, mateRect)
             else:
                 jangSurf = TITLE_FONT.render('Janggoon!', True, color)
                 jangRect = jangSurf.get_rect()
-                jangRect.center = (HALF_WINDOW_WIDTH,140)
+                jangRect.center = (HALF_WINDOW_WIDTH,110)
                 DISPLAYSURF.blit(jangSurf, jangRect)
 
 
