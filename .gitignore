@@ -6,3 +6,4 @@ policy_input_len1459617.p
 *.pickle
 *.h5
 short-btq/
+total-short*
