@@ -88,9 +88,10 @@ def match_str2dict(match_str):
 
         
         action_lst=action_str.split('. ')
+       
         action_lst=action_lst[1:]
-        action_lst=[action[:5] for action in action_lst]
-        
+        action_lst=[action[:6] for action in action_lst]
+        action_lst=[''.join(s for s in action if s.isdigit()) for action in action_lst]
 
 
         match_info['action_lst']=action_lst
