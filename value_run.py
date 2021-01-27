@@ -25,8 +25,8 @@ def simple_run(model):
         mc.appendLeaf(currentNode)
         for idx, (action, edge) in enumerate(currentNode.edges):
             #U : exploration term
-            x=edge.outNode.state.newInput()
-            Q = model.predict(np.reshape(x,(1,29,10,9)))[0]
+            x=edge.outNode.state.BoardToInput
+            Q = model.predict(np.reshape(x,(1,15,10,9)))[0]
         
 
             if Q > maxQ:
@@ -89,7 +89,7 @@ def simulate_run(model,sim):
                 breadcrumbs.append(simulationEdge)
             mc.appendLeaf(currentNode)
             x=currentNode.state.newInput()
-            value=float(model.predict(np.reshape(x,(1,29,10,9))))
+            value=float(model.predict(np.reshape(x,(1,33,10,9))))
             for edge in breadcrumbs:
                 edge.stats['N'] = edge.stats['N'] +1
                 edge.stats['W'] += value
@@ -140,8 +140,8 @@ def simulate_run(model,sim):
 
 
 if __name__=='__main__':
-    model = Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (29,10,9), 1,config.HIDDEN_CNN_LAYERS)
-    path='on9876_value_model_version0121.h5'
+    model = Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (15,10,9), 1,config.HIDDEN_CNN_LAYERS)
+    path='value_model_version1234.h5'
     m_tmp = model.read(path)
     model.model.set_weights(m_tmp.get_weights())
-    simulate_run(model,600)
+    simple_run(model)

@@ -23,7 +23,8 @@ def playwithme(model,turn):
             maxQ=-9999
             
             for idx, action in enumerate(env.gameState.allowedActions()):
-                x=env.gameState.newInput()
+                newState, value, done = env.gameState.takeAction(action)
+                x=newState.newInput()
                 Q = model.predict(np.reshape(x,(1,29,10,9)))[0]
 
                 if Q > maxQ:
@@ -39,7 +40,7 @@ def playwithme(model,turn):
 
 if __name__=='__main__':
     model = Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (29,10,9), 1,config.HIDDEN_CNN_LAYERS)
-    path='value_model_version9876.h5'
+    path='on9876_value_model_version0121.h5'
     m_tmp = model.read(path)
     model.model.set_weights(m_tmp.get_weights())
     playwithme(model,1)

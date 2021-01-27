@@ -283,7 +283,7 @@ def value_learning(data):
 	tot_y=[]
 	for state in data:
 		s=GameState(state[0],state[1])
-		tot_x.append(s.newInput())
+		tot_x.append(s.newnewInput())
 		tot_y.append(state[2])
 
 	total_data=list(zip(tot_x,tot_y))
@@ -299,30 +299,30 @@ def value_learning(data):
 
 if __name__=='__main__':
 
-	value_NN =Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (29,10,9), 1, config.HIDDEN_CNN_LAYERS)
+	value_NN =Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (33,10,9), 1, config.HIDDEN_CNN_LAYERS)
 	model=value_NN
 	path = 'board-numTurn-Q-len1366975.pickle'
 	with open(path, 'rb') as f:
 		data=pickle.load(f)
 	random.shuffle(data)
 	# for iter in range(3):
-	for i in range(10):
+	for i in range(14):
 		# print('iter',iter)
 		data_split=data[100000*i:100000*(i+1)]
 		with tf.device("/gpu:0"):
 			value_learning(data_split)
-	model.write('start_init_', 121)
+	model.write('newnewinput_', 1111)
 
-	model = Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (29,10,9), 1,config.HIDDEN_CNN_LAYERS)
-	path='value_model_version9876.h5'
-	m_tmp = model.read(path)
-	model.model.set_weights(m_tmp.get_weights())
-	for i in range(10):
-		# print('iter',iter)
-		data_split=data[100000*i:100000*(i+1)]
-		with tf.device("/gpu:0"):
-			value_learning(data_split)
-	model.write('on9876_', 121)
+	# model = Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (29,10,9), 1,config.HIDDEN_CNN_LAYERS)
+	# path='value_model_version9876.h5'
+	# m_tmp = model.read(path)
+	# model.model.set_weights(m_tmp.get_weights())
+	# for i in range(10):
+	# 	# print('iter',iter)
+	# 	data_split=data[100000*i:100000*(i+1)]
+	# 	with tf.device("/gpu:0"):
+	# 		value_learning(data_split)
+	# model.write('on9876_', 121)
 
 
 

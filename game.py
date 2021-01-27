@@ -184,8 +184,6 @@ class GameState():
 			mark=(i+1)*self.playerTurn
 			input_arr[i]=np.where(self.board!=mark,0,self.board)
 			input_arr[i+7]=np.where(self.board!=-mark,0,self.board)
-			input_arr[i+14]=np.zeros((10,9)) #위헙을 가하고 있는 상대 기물
-			input_arr[i+21]=np.zeros((10,9)) #위헙을 당하고 있느 나의 기물
 
 		for now_action in self.allowedActions():
 			if now_action==None:
@@ -217,19 +215,17 @@ class GameState():
 		#7~13 : 상대의 기물 위치 
 		#14~20 : 본인이 취할 수 있는 상대 기물 위치
 		#21~27 : 상대가 취할 수 있는 본인 기물 위치
-		#28~34 : 본인이 취할 수 있지만, 상대 기물이 보복 가능한 위치 
-		#35~41 : 상대가 취할 수 있지만, 본인 기물이 보복 가능한 위치
-		#42 : 누구의 턴인지
-		input_arr=np.zeros((29,10,9),dtype=float)
+		#28    : 상대의 왕을 위헙하는 나의 기물 위치
+		#29    : 나의 왕을 위헙하는 상대의 기물 위치
+		#30    : 나의 점수
+		#31    : 상대의 점수
+		#32    : 현재 턴
+		input_arr=np.zeros((33,10,9),dtype=float)
 		for i in range(7):
 			#해당되는 값이 아닌 곳은 0으로 
 			mark=(i+1)*self.playerTurn
 			input_arr[i]=np.where(self.board!=mark,0,self.board)
 			input_arr[i+7]=np.where(self.board!=-mark,0,self.board)
-			input_arr[i+14]=np.zeros((10,9)) #위헙을 가하고 있는 상대 기물
-			input_arr[i+21]=np.zeros((10,9)) #위헙을 당하고 있는 나의 기물
-			input_arr[i+28]=np.zeros((10,9)) #상대가 보복 가능한 위치
-			input_arr[i+35]=np.zeros((10,9)) #본인이 보복 가능한 위치
 
 		for now_action in self.allowedActions():
 			if now_action==None:
@@ -239,6 +235,9 @@ class GameState():
 				oppo_mark=-(i+1)*self.playerTurn
 				if self.board[after[0],after[1]]==oppo_mark:
 					input_arr[i+14][after[0],after[1]]=1	
+					if i==6:
+						before=action_to_coord(now_action)[0]
+						input_arr[28][before[0],before[1]]=1
 
 		next_state=GameState(self.board, self.num_turn+1)
 		for next_action in next_state.allowedActions():
@@ -249,9 +248,13 @@ class GameState():
 				mark=(i+1)*self.playerTurn
 				if self.board[after[0],after[1]]==mark:
 					input_arr[i+21][after[0],after[1]]=1
+					if i==6:
+						before=action_to_coord(now_action)[0]
+						input_arr[29][before[0],before[1]]=1
 		
-
-		input_arr[28]=np.ones((10,9))*self.playerTurn
+		input_arr[30]=np.ones((10,9))*self.playerScore
+		input_arr[31]=np.ones((10,9))*self.oppoScore
+		input_arr[32]=np.ones((10,9))*self.playerTurn
 		return input_arr
 	#state를 id로 변환
 	def _convertStateToId(self):
