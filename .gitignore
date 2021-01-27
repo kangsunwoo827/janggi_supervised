@@ -2,7 +2,7 @@ gib_raw/
 gib_str/
 gib_policy/
 policy_best_model.h5
-policy_input_len1459617.p
+policy_input*
 *.pickle
 *.h5
 short-btq/

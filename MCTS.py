@@ -2,7 +2,7 @@ import numpy as np
 import logging
 import config
 import tensorflow as tf
-from utils import setup_logger,action_to_message
+from utils import setup_logger,action_to_message, make_action_space, action_to_coord
 
 class Node():
 
@@ -47,6 +47,8 @@ class MCTS():
 	def __len__(self):
 		return len(self.tree)
 
+	
+
 	def newmoveToLeaf(self):
 
 		# lg.logger_mcts.info('------MOVING TO LEAF------')
@@ -56,22 +58,34 @@ class MCTS():
 
 		done = 0
 		value = 0
+		action_space=make_action_space()
 		# window=Visualize(currentNode.state)
+		
+		# from collections import deque
+		# history_que=deque( range(6), maxlen=6 )
 		while True:
-			allowedActions=currentNode.state.allowedActions() 
-			if currentNode.numTurn<=30 : 
-				simulationAction=random.choice(allowedActions)
-			else:
-				maxQ=-9999
-				for action in allowedActions:
-					simState, _, _ = currentNode.state.takeAction(action)
-					x=simState.newInput()
-					with tf.device("/gpu:0"):
-						Q = float(model.predict(np.reshape(x,(1,29,10,9))))
-					if Q > maxQ:
-						maxQ = Q 
-						simulationAction = action
-				print(maxQ)
+			allowedActions=currentNode.state.allowedActions()
+			allowed_idx=[action_space.index(action) for action in allowedActions]
+			
+			mask=np.zeros(len(action_space))
+			mask[allowed_idx]=1
+			x=currentNode.state.BoardToInput
+			action_pred = model.predict(np.reshape(x,(1,15,10,9)))
+			# print(history_que)
+			# if history_que[0]==history_que[4] and history_que[1]==history_que[5]:
+			# 	ban_idx=history_que[2]
+			# 	mask[ban_idx]=0
+			
+			action_pred += np.random.normal(0,1/10,len(action_space))
+			action_pred=action_pred*mask
+			pred_idx=np.argmax(action_pred)
+			for action in allowedActions:
+				after=action_to_coord(action)[1]
+				if currentNode.state.board[after[0],after[1]]==(-7)*currentNode.state.playerTurn:
+					kill_idx=action_space.index(action)
+					pred_idx=kill_idx
+			simulationAction = action_space[pred_idx]
+			# history_que.append(pred_idx)
 			# (simulationAction,simulationEdge) = random.sample(currentNode.edges,1)[0]
 			newState, value, done = currentNode.state.takeAction(simulationAction) #the value of the newState from the POV of the new playerTurn
 			if newState.id not in self.tree:
@@ -134,7 +148,6 @@ class MCTS():
 				done = 0
 				value = 0
 				
-
 			if done:
 				
 				break
@@ -189,23 +202,25 @@ def loop_simulate(mcts_arg):
 		mcts=mcts_arg
 		i=1
 		l=time.time()
+		
 		while True:
-			leaf, value, done, breadcrumbs = mcts.moveToLeaf()
+			leaf, value, done, breadcrumbs = mcts.newmoveToLeaf()
 			mcts.backFill(leaf, value, breadcrumbs)
 			i+=1
+			print(i)
 			if i%500==0:
 				print('iteration{}-tree:{}'.format(i, len(mcts.tree)))
 				
 				print(time.time()-l)
 				l=time.time()
-				if len(mcts.tree)>150000:
+				if len(mcts.tree)>800000:
 					print('save mcts_tree')
 					new_tree=[]
 					for key in mcts.tree:
 						for edge in mcts.tree[key].edges:
 							edge=edge[1]
 							new_tree.append([edge.outNode.state.board, edge.outNode.numTurn, edge.stats['Q']])
-					with open('short-btq-len{}.pickle'.format(len(new_tree)), 'wb') as f:
+					with open('gibo_policy_len{}.pickle'.format(len(new_tree)), 'wb') as f:
 						pickle.dump(new_tree, f)
 					break
 
@@ -250,11 +265,18 @@ def loop_test(mcts_arg):
 		currentNode = simulationEdge.outNode
 		if done:
 			break
-from value_model import Residual_CNN
-model = Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (29,10,9), 1,config.HIDDEN_CNN_LAYERS)
-path='value_model_version9876.h5'
+# from value_model import Residual_CNN
+# model = Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (29,10,9), 1,config.HIDDEN_CNN_LAYERS)
+# path='value_model_version9876.h5'
+# m_tmp = model.read(path)
+# model.model.set_weights(m_tmp.get_weights())
+
+from policy_model import Policy_Residual_CNN
+model =Policy_Residual_CNN(config.REG_CONST, config.LEARNING_RATE, (15,10,9), 2450, config.HIDDEN_CNN_LAYERS)
+path='gibo_policy0127.h5'
 m_tmp = model.read(path)
 model.model.set_weights(m_tmp.get_weights())
+
 
 if __name__=='__main__':
 	

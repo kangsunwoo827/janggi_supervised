@@ -14,15 +14,15 @@ class Gen_Model():
 	def predict(self, x):
 		return self.model.predict(x)
 
-	def fit(self, states, targets, epochs, verbose, validation_split, batch_size, callbacks):
-		return self.model.fit(states, targets, epochs=epochs, verbose=verbose, validation_split = validation_split, batch_size = batch_size, callbacks=callbacks )
+	def fit(self, states, targets, epochs, verbose, validation_split, batch_size):
+		return self.model.fit(states, targets, epochs=epochs, verbose=verbose, validation_split = validation_split, batch_size = batch_size)
 
-	def write(self, game, version):
-		self.model.save('policy_model_save/version' + "{0:0>4}".format(version) + '.h5')
+	def write(self, sentense, version):
+		self.model.save('{}'.format(sentense) + "{0:0>4}".format(version) + '.h5')
 
-	def read(self, game, run_number, version):
-		return load_model( run_archive_folder + '/run' + str(run_number).zfill(4) + "/models/version" + "{0:0>4}".format(version) + '.h5', custom_objects={'softmax_cross_entropy_with_logits': softmax_cross_entropy_with_logits})
-
+	def read(self,path):
+		return load_model(path)
+		
 	def printWeightAverages(self):
 		layers = self.model.layers
 		for i, l in enumerate(layers):
@@ -155,7 +155,7 @@ class Policy_Residual_CNN(Gen_Model):
 		x = Dense(
 			self.output_dim
 			, use_bias=False
-			, activation='linear'
+			, activation='softmax'
 			, kernel_regularizer=regularizers.l2(self.reg_const)
 			, name = 'policy_head'
 			)(x)

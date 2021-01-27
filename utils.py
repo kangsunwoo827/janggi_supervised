@@ -410,7 +410,6 @@ def make_action_space():
     
     #coord-> action
     action_space=[coord_to_action(coord) for coord in coord_space if 0<=coord[1][0]<=9 and 0<=coord[1][1]<=8]
-    action_space.append(None)
 
     return action_space
 
