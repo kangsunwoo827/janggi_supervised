@@ -173,14 +173,15 @@ class MCTS():
 
 	def backFill(self, leaf, value, breadcrumbs):
 		# lg.logger_mcts.info('------DOING BACKFILL------')
-
+		next_loss=0
 		for edge in breadcrumbs:
 
 			edge.stats['N'] = edge.stats['N'] + 1
 			discount_value=(-discount)**(leaf.numTurn-edge.numTurn-1)
 			#value는 그 상황에 대한 그 턴의 플레이어가 느끼는 가치 (이겼으면 1)
 			edge.stats['W'] = edge.stats['W'] - value*discount_value
-			edge.stats['Q'] = edge.stats['W'] / edge.stats['N']
+			edge.stats['Q'] = (edge.stats['W'] / edge.stats['N'])*100 + (edge.inNode.state.oppoScore-edge.outNode.state.oppoScore) - next_loss
+			next_loss = -1*(edge.inNode.state.oppoScore-edge.outNode.state.oppoScore)
 
 	def addNode(self, node):
 		self.tree[node.id] = node
